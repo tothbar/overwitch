@@ -400,3 +400,39 @@ static const struct overbridge_device_desc OB_DEVICE_DESCS[] = {
   DIGITAKT_DESC, DIGITONE_DESC, ARMK2_DESC, NULL
 };
 ```
+
+### Setting up a script and an udev rule to start overwitch when device is connected
+
+You can create an udev rule, that starts a script every time if your overbridge enabled device is connected.
+First look for your devices product ID with  ``` lsusb  ```
+
+Create an udev rule to start a script when the device is connected.
+
+```sudo nano /etc/udev/rules.d/run_overwitch_dt.rules ```
+
+then write inside
+
+``` ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="VENDOR_ID", ATTR{idProduct}=="PRODUCT_ID", RUN+="run_overwitch_dt.sh " ```
+
+
+
+When u have it u can create a script, to start overwitch-cli, and write the output of that (if there are any errors) to the usb-log with the following:
+```
+sudo nano /usr/local/bin/run_overwitch_dt.sh 
+```
+
+Call it whatever you want, this time i called it run_overwitch_dt, becouse i use it with the Digitone.
+
+put inside the file the following
+```
+#!/bin/bash
+sleep 1
+sudo -u <your username> /usr/local/bin/overwitch-cli -d <your devices name (Digitone)> -v >> /var/log/usb-log.txt 2>&1
+echo "Digitone-overwitch started" >> /var/log/usb-log.txt
+```
+
+run ``` sudo chmod +x /usr/local/bin/run_overwitch_dt.sh ```
+
+it should be good to go!
+
+
